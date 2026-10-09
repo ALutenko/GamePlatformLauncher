@@ -1,6 +1,6 @@
 [package]
 name = "lutarea-launcher"
-version = "0.2.0"
+version = "0.2.1"
 description = "Lutarea Launcher — desktop client for games.lutarea.com"
 authors = ["Lutarea"]
 edition = "2021"

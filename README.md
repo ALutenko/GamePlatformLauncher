@@ -14,7 +14,7 @@ Builds are currently **unsigned** — see the notes on each release for how to o
 
 ## What it does
 
-- **Store** — the full Lutarea catalog (The Kingdom of Beasts series, Worldspire, Hotfix, Compound, Vitals, Inkhouse, Hatchling, Orebelt, Ink & Steel, Wayfarers, Cartridge, …) with key art, genre and release status. Browsable as a guest.
+- **Store** — the full Lutarea catalog (The Kingdom of Beasts series, Worldspire, Hotfix, Compound, Vitals, Inkhouse, Hatchling, Orebelt, Ink & Steel, Wayfarers, Cartridge, …) with key art, genre and release status. Browsable as a guest: the catalog ships inside the app (`src/catalog/offline.ts`, a copy of the platform seed) and is replaced by live `/catalog` data when the platform is reachable; buying and downloading need a Lutarea account.
 - **Account** — one Lutarea account for the site, the web store and the launcher. Sign in / create account from the sidebar; downloads and the library require an account.
 - **Library** — games you own or claimed for free. Install downloads the build, verifies its SHA‑256, extracts it and remembers where it lives; **Play** launches it.
 - Purchases happen in the web store (opened from the launcher); they appear in the library automatically.

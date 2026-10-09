@@ -26,7 +26,21 @@ interface Props {
   onPlay: () => void;
   onClaim: () => void;
   onBuy: () => void;
+  onSignIn: () => void;
   onOpenSite: () => void;
+}
+
+/** Guests see every action, but locked: the hint tells them why and opens the sign-in modal. */
+function GuestHint({ text, onSignIn }: { text: string; onSignIn: () => void }) {
+  return (
+    <span className="hero-note">
+      <LockIcon style={{ width: 13, height: 13, verticalAlign: "-2px", marginRight: 6 }} />
+      {text}{" "}
+      <button type="button" className="link-btn" onClick={onSignIn}>
+        Sign in
+      </button>
+    </span>
+  );
 }
 
 export function HeroPanel({
@@ -41,6 +55,7 @@ export function HeroPanel({
   onPlay,
   onClaim,
   onBuy,
+  onSignIn,
   onOpenSite,
 }: Props) {
   const style = {
@@ -126,18 +141,18 @@ export function HeroPanel({
             </>
           ) : game.kind === "free" ? (
             <>
-              <button type="button" className="btn btn-accent" onClick={onClaim} disabled={busy}>
-                {signedIn ? <DownloadIcon /> : <LockIcon />} Add to library · Free
+              <button type="button" className="btn btn-accent" onClick={onClaim} disabled={busy || !signedIn}>
+                <DownloadIcon /> Add to library · Free
               </button>
-              {!signedIn && <span className="hero-note">Sign in to download games.</span>}
+              {!signedIn && <GuestHint text="Sign in to add and download games." onSignIn={onSignIn} />}
             </>
           ) : (
             <>
               <span className="hero-price">{priceLabel(game)}</span>
-              <button type="button" className="btn btn-accent" onClick={onBuy} disabled={busy}>
+              <button type="button" className="btn btn-accent" onClick={onBuy} disabled={busy || !signedIn}>
                 <ExternalIcon /> Buy on store
               </button>
-              {!signedIn && <span className="hero-note">Sign in to download after purchase.</span>}
+              {!signedIn && <GuestHint text="Sign in to buy and download." onSignIn={onSignIn} />}
             </>
           )}
         </div>

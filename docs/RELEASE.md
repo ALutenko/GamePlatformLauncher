@@ -25,7 +25,7 @@ Download base URL: `https://github.com/ALutenko/GamePlatformLauncher/releases/la
    - `src/App.tsx` → `const VERSION`
 2. Commit, then tag and push:
    ```bash
-   git tag v0.2.0
+   git tag v0.2.1
    git push origin main --tags
    ```
 3. The **Release** workflow runs three build jobs in parallel and one publish job. Expect ~15–25 min (Rust compile on three OSes; `rust-cache` speeds up later runs).

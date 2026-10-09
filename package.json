@@ -1,6 +1,6 @@
 {
   "name": "lutarea-launcher",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "description": "Lutarea Launcher — desktop client for games.lutarea.com (Tauri 2 + React)",

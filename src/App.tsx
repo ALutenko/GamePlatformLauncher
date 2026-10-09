@@ -3,6 +3,7 @@ import { ApiError, STORE_URL, api } from "./api/client";
 import type { Game, LibraryItem } from "./api/types";
 import { isObtainable } from "./api/types";
 import { NotSignedIn, session, useSession } from "./auth/session";
+import { OFFLINE_GAMES } from "./catalog/offline";
 import { AuthModal } from "./components/AuthModal";
 import { GameGrid } from "./components/GameGrid";
 import { HeroPanel } from "./components/HeroPanel";
@@ -19,7 +20,7 @@ import {
   type InstallProgress,
 } from "./native";
 
-const VERSION = "0.2.0";
+const VERSION = "0.2.1";
 const SITE_URL = "https://games.lutarea.com";
 const SIGN_IN_TO_DOWNLOAD = "Sign in to download games";
 
@@ -36,9 +37,10 @@ export function App() {
   const desktop = useMemo(() => isTauri(), []);
 
   const [tab, setTab] = useState<Tab>("store");
-  const [games, setGames] = useState<Game[]>([]);
+  // Bundled catalog first, so the store is never empty; /catalog replaces it when reachable.
+  const [games, setGames] = useState<Game[]>(OFFLINE_GAMES);
   const [library, setLibrary] = useState<LibraryItem[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(() => pickFeatured(OFFLINE_GAMES)?.id ?? null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [online, setOnline] = useState<boolean | null>(null);
@@ -55,16 +57,16 @@ export function App() {
     window.setTimeout(() => setToast((t) => (t?.text === text ? null : t)), 5000);
   }, []);
 
-  // Catalog is public — guests see the whole store.
+  // Catalog is public — guests see the whole store. Offline: keep the bundled preview.
   useEffect(() => {
     let cancelled = false;
     api
       .catalog()
       .then(({ games }) => {
         if (cancelled) return;
-        setGames(games);
+        if (games.length > 0) setGames(games);
         setOnline(true);
-        setSelectedId((id) => id ?? pickFeatured(games)?.id ?? null);
+        setSelectedId((id) => (id && games.some((g) => g.id === id) ? id : (pickFeatured(games)?.id ?? id)));
       })
       .catch(() => !cancelled && setOnline(false));
     return () => {
@@ -240,7 +242,7 @@ export function App() {
           <label className="search">
             <SearchIcon />
             <input
-              placeholder={tab === "store" ? "Search 21 games…" : "Search your library…"}
+              placeholder={tab === "store" ? `Search ${games.length} games…` : "Search your library…"}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -259,7 +261,8 @@ export function App() {
             onInstall={() => requireAuth(SIGN_IN_TO_DOWNLOAD, () => void install(selected))}
             onPlay={() => void play(selected)}
             onClaim={() => requireAuth(SIGN_IN_TO_DOWNLOAD, () => void claim(selected))}
-            onBuy={() => void openExternal(`${STORE_URL}/games/${selected.slug}`)}
+            onBuy={() => requireAuth("Sign in to buy games", () => void openExternal(`${STORE_URL}/games/${selected.slug}`))}
+            onSignIn={() => setAuth({ open: true, reason: SIGN_IN_TO_DOWNLOAD })}
             onOpenSite={() => void openExternal(`${SITE_URL}/${selected.series}`)}
           />
         )}
@@ -298,16 +301,15 @@ export function App() {
             )}
           </h2>
           <span>
-            {desktop ? `Installing for ${platform}` : "Browser preview — installs open as downloads"}
+            {online === false
+              ? "Store preview — the games platform is offline, prices and downloads update when it is back"
+              : desktop
+                ? `Installing for ${platform}`
+                : "Browser preview — installs open as downloads"}
           </span>
         </div>
 
-        {online === false && games.length === 0 ? (
-          <div className="empty">
-            <h3>Store unavailable</h3>
-            <p>Cannot reach the Lutarea games platform. Check your connection and restart the launcher.</p>
-          </div>
-        ) : tab === "library" && library.length === 0 ? (
+        {tab === "library" && library.length === 0 ? (
           <div className="empty">
             <h3>Nothing here yet</h3>
             <p>Free games can be added from the Store tab; purchases from the web store appear here automatically.</p>
