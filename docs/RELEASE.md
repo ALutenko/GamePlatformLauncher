@@ -67,4 +67,4 @@ pnpm tauri build            # current OS only
 pnpm tauri build --target universal-apple-darwin   # macOS universal
 ```
 
-Rust is required (`rustup`); Linux needs `libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf`. Commit `src-tauri/Cargo.lock` after the first successful local build so CI builds are reproducible.
+Rust is required (`rustup`); Linux needs `libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf`. `src-tauri/Cargo.lock` is committed so CI builds are reproducible — commit it again whenever Cargo dependencies change.
