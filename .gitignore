@@ -1,13 +1,5 @@
-.DS_Store
+# Releases-only repository: nothing is built here. Leftovers from the old checkout stay untracked.
 node_modules/
 dist/
-.env
-.env.*
-!.env.example
-*.log
-*.tsbuildinfo
-.vite/
-
-# Tauri / Rust
-src-tauri/target/
-src-tauri/gen/
+src-tauri/
+.DS_Store
